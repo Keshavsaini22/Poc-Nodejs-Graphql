@@ -1,6 +1,11 @@
-import UserService, { CreateUserPayload } from "../../../services/users.service";
+import UserService, { CreateUserPayload, GetUserTokenPayload } from "../../../services/users.service";
 
-const queries = {};
+const queries = {
+  getUserToken: async (_: any, payload: GetUserTokenPayload) => {
+    const res = await UserService.getUserToken(payload);
+    return res;
+  },
+};
 
 const mutations = {
   createUser: async (_: any, payload: CreateUserPayload) => {
@@ -10,6 +15,6 @@ const mutations = {
 };
 
 export const resolvers = {
-  Query: queries, 
+  Query: queries,
   Mutation: mutations,
 };

@@ -1,5 +1,6 @@
 import { createHmac, randomBytes } from "node:crypto";
 import { prismaClient } from "../infrastructure/database/db";
+import JWT from "jsonwebtoken";
 
 const JWT_SECRET = "$uperM@n@123";
 
@@ -42,29 +43,29 @@ class UserService {
     });
   }
 
-  // private static getUserByEmail(email: string) {
-  //   return prismaClient.user.findUnique({ where: { email } });
-  // }
+  private static getUserByEmail(email: string) {
+    return prismaClient.user.findUnique({ where: { email } });
+  }
 
-  // public static async getUserToken(payload: GetUserTokenPayload) {
-  //   const { email, password } = payload;
-  //   const user = await UserService.getUserByEmail(email);
-  //   if (!user) throw new Error("user not found");
+  public static async getUserToken(payload: GetUserTokenPayload) {
+    //login function
+    const { email, password } = payload;
+    const user = await UserService.getUserByEmail(email);
+    if (!user) throw new Error("User not found");
 
-  //   const userSalt = user.salt;
-  //   const usersHashPassword = UserService.generateHash(userSalt, password);
+    const userSalt = user.salt;
+    const usersHashPassword = UserService.generateHash(userSalt, password);
 
-  //   if (usersHashPassword !== user.password)
-  //     throw new Error("Incorrect Password");
+    if (usersHashPassword !== user.password) throw new Error("Incorrect Password");
 
-  //   // Gen Token
-  //   const token = JWT.sign({ id: user.id, email: user.email }, JWT_SECRET);
-  //   return token;
-  // }
+    // Gen Token
+    const token = JWT.sign({ id: user.id, email: user.email }, JWT_SECRET);
+    return token;
+  }
 
-  // public static decodeJWTToken(token: string) {
-  //   return JWT.verify(token, JWT_SECRET);
-  // }
+  public static decodeJWTToken(token: string) {
+    return JWT.verify(token, JWT_SECRET);
+  }
 }
 
 export default UserService;

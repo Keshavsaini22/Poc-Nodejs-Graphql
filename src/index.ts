@@ -1,7 +1,7 @@
 import express from "express";
 import { expressMiddleware } from "@apollo/server/express4";
-import { ApolloServer } from "@apollo/server";
 import dotenv from "dotenv";
+import createApolloGraphqlServer from "./infrastructure/graphql";
 dotenv.config();
 
 async function init() {
@@ -10,30 +10,13 @@ async function init() {
 
   app.use(express.json());
 
-  //Create Apollo GraphQL Server
-  const gqlServer = new ApolloServer({
-    typeDefs: `
-    type Query {
-      hello: String
-      sayHello(name: String): String
-    }
-    `,
-    resolvers: {
-      Query: {
-        hello: () => "Hello GraphQL",
-        sayHello: (_, { name }) => `Hello ${name}`,
-      },
-    },
-  });
-
-  //Start Apollo GraphQL Server
-  await gqlServer.start();
+  const graphqlServer = await createApolloGraphqlServer();
 
   app.get("/", (req, res) => {
     res.json("Hello GraphQL");
   });
 
-  app.use("/graphql", expressMiddleware(gqlServer));
+  app.use("/graphql", expressMiddleware(graphqlServer));
 
   app.listen(PORT, () => console.log(`Server started at PORT:${PORT}`));
 }
